@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<robot name="hub" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- <xacro:include filename="$(find hub)/urdf/hub.gazebo.xacro"/> -->
+    <xacro:include filename="$(find hub)/urdf/hub_properties.urdf.xacro"/>
+
+    <!-- base link -->
+    <link name="base_link">
+        <visual>
+        </visual>
+
+        <intertial>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+            <mass value="0.01"/>
+        </intertial>
+    </link>
+
+    <!-- alumnium extrusion frame macro-->
+    <xacro:macro name="frame" params="suffix rotation x_reflect z_reflect">
+        <link name="${suffix}_extrusion">
+            <collision>
+
+            </collision>
+            <visual>
+                <material name="grey"/>
+                <geometry>
+                    <box size="${ext_width} ${ext_height} ${ext_length}"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <joint name="${suffix}_extrusion_to_base" type="fixed">
+            <parent link="base_link"/>
+            <child link="${suffix}_extrusion"/>
+            <origin xyz="${x_reflect*hub_width/2} 0.0 ${z_reflect*hub_height/2}" rpy="0.0 ${rotation} 0.0"/>
+        </joint>
+
+    </xacro:macro>
+
+    <!-- create the frame -->
+    <xacro:frame suffix= "bottom" rotation="${-1*pi_val/2}" x_reflect="0" z_reflect="-1.0"/>
+    <xacro:frame suffix="top" rotation="${-1*pi_val/2}" x_reflect="0" z_reflect="1.0"/>
+    <xacro:frame suffix="left" rotation="0.0" x_reflect="-1.0" z_reflect="0.0"/>
+    <xacro:frame suffix="right" rotation="0.0" x_reflect="1.0" z_reflect="0.0"/>
+
+
+
+    <!-- x axis arm -->
+    <link name="x_axis_arm">
+        <collision>
+
+        </collision>
+        <visual>
+            <material name="black"/>
+            <geometry>
+                <box size="${ext_width} ${ext_height} ${x_axis_arm_length}"/>
+            </geometry>
+        </visual>
+        <inertial>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+            <mass value="2"/>
+            <!-- <mass value="${al_density*ext_width*ext_height*x_axis_arm_length}"/> -->
+        </inertial>
+    </link>
+
+    <joint name="x_axis_arm_joint" type="prismatic">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 ${pi_val/2} 0.0"/>
+        <parent link="base_link"/>
+        <child link="x_axis_arm"/>
+        <axis xyz="1 0 0"/>
+         <limit effort="10000" lower="-5.0" upper="5.0" velocity="1" />
+    </joint>
+
+    <!-- parcel holder -->
+    <link name="parcel_holder">
+        <collision>
+        </collision>
+
+        <visual>
+            <geometry>
+                <!-- TODO: Figure why this mesh file can't be read|found -->
+                <!-- <mesh filename="file://$(find hub)/meshes/parcel_holder.obj" scale="1.0 1.0 1.0"/> -->
+
+                <!-- make shift -->
+                <box size="${holder_thickness} ${holder_length} ${holder_width}"/>
+            </geometry>
+        </visual>
+        <inertial>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+            <mass value="0.5"/>
+        </inertial>
+    </link>
+
+    <joint name="x_axis_arm_to_holder" type="prismatic">
+        <parent link="x_axis_arm"/>
+        <child link="parcel_holder"/>
+        <origin xyz="-${ext_width} 0.0 0.0"/>
+        <axis xyz="0 0 1"/>
+         <limit effort="10000" lower="-5.0" upper="5.0" velocity="1" />
+    </joint>
+
+
+</robot>
