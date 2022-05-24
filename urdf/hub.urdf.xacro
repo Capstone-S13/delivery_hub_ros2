@@ -2,30 +2,45 @@
 <robot name="hub" xmlns:xacro="http://www.ros.org/wiki/xacro">
     <!-- <xacro:include filename="$(find hub)/urdf/hub.gazebo.xacro"/> -->
     <xacro:include filename="$(find hub)/urdf/hub_properties.urdf.xacro"/>
+		<link name="world"/>
 
     <!-- base link -->
     <link name="base_link">
         <visual>
+					<geometry>
+					</geometry>
         </visual>
 
-        <intertial>
+        <inertial>
             <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-            <mass value="0.01"/>
-        </intertial>
+            <mass value="0.1"/>
+        </inertial>
     </link>
 
-    <!-- alumnium extrusion frame macro-->
-    <xacro:macro name="frame" params="suffix rotation x_reflect z_reflect">
-        <link name="${suffix}_extrusion">
-            <collision>
+  	<joint name="world_to_base" type="fixed">
+  	  <origin rpy="0 0 0" xyz="0 0 0.9"/>
+  	  <parent link="world"/>
+  	  <child link="base_link"/>
+  	</joint>
 
-            </collision>
+    <!-- alumnium extrusion frame macro-->
+    <xacro:macro name="frame" params="suffix rotation x_reflect z_reflect length">
+        <link name="${suffix}_extrusion">
+						<collision>
+                <geometry>
+                    <box size="${ext_width} ${ext_height} ${length}"/>
+                </geometry>
+						</collision>
             <visual>
                 <material name="grey"/>
                 <geometry>
-                    <box size="${ext_width} ${ext_height} ${ext_length}"/>
+                    <box size="${ext_width} ${ext_height} ${length}"/>
                 </geometry>
             </visual>
+					  <inertial>
+            	<inertia ixx="0.000" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.00"/>
+            	<mass value="0.01"/>
+        		</inertial>
         </link>
 
         <joint name="${suffix}_extrusion_to_base" type="fixed">
@@ -37,18 +52,14 @@
     </xacro:macro>
 
     <!-- create the frame -->
-    <xacro:frame suffix= "bottom" rotation="${-1*pi_val/2}" x_reflect="0" z_reflect="-1.0"/>
-    <xacro:frame suffix="top" rotation="${-1*pi_val/2}" x_reflect="0" z_reflect="1.0"/>
-    <xacro:frame suffix="left" rotation="0.0" x_reflect="-1.0" z_reflect="0.0"/>
-    <xacro:frame suffix="right" rotation="0.0" x_reflect="1.0" z_reflect="0.0"/>
-
+    <xacro:frame suffix= "bottom" rotation="${-1*pi_val/2}" x_reflect="0" z_reflect="-1.0" length="${hub_width+ext_width}"/>
+    <xacro:frame suffix="top" rotation="${-1*pi_val/2}" x_reflect="0" z_reflect="1.0" length="${hub_width+ext_width}"/>
+    <xacro:frame suffix="left" rotation="0.0" x_reflect="-1.0" z_reflect="0.0" length="${ext_length}"/>
+    <xacro:frame suffix="right" rotation="0.0" x_reflect="1.0" z_reflect="0.0" length="${ext_length}"/>
 
 
     <!-- x axis arm -->
     <link name="x_axis_arm">
-        <collision>
-
-        </collision>
         <visual>
             <material name="black"/>
             <geometry>
@@ -56,7 +67,7 @@
             </geometry>
         </visual>
         <inertial>
-            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
             <mass value="2"/>
             <!-- <mass value="${al_density*ext_width*ext_height*x_axis_arm_length}"/> -->
         </inertial>
@@ -67,14 +78,26 @@
         <parent link="base_link"/>
         <child link="x_axis_arm"/>
         <axis xyz="1 0 0"/>
-         <limit effort="10000" lower="-5.0" upper="5.0" velocity="1" />
+         <limit effort="10000" lower="-${hub_height/2}" upper="${hub_height/2}" velocity="1" />
     </joint>
+
+  	<ros2_control name="GazeboSystem" type="system">
+  	  <hardware>
+  	    <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+  	  </hardware>
+  	  <joint name="x_axis_arm_joint">
+  	    <command_interface name="position">
+  	      <param name="min">${-hub_height/2}</param>
+  	      <param name="max">${hub_height/2}</param>
+  	    </command_interface>
+  	    <state_interface name="position"/>
+  	    <state_interface name="velocity"/>
+  	    <state_interface name="effort"/>
+  	  </joint>
+  	</ros2_control>
 
     <!-- parcel holder -->
     <link name="parcel_holder">
-        <collision>
-        </collision>
-
         <visual>
             <geometry>
                 <!-- TODO: Figure why this mesh file can't be read|found -->
@@ -85,7 +108,7 @@
             </geometry>
         </visual>
         <inertial>
-            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
             <mass value="0.5"/>
         </inertial>
     </link>
@@ -95,8 +118,24 @@
         <child link="parcel_holder"/>
         <origin xyz="-${ext_width} 0.0 0.0"/>
         <axis xyz="0 0 1"/>
-         <limit effort="10000" lower="-5.0" upper="5.0" velocity="1" />
+        <limit effort="10000" lower="-${hub_width/2}" upper="${hub_width/2}" velocity="0.01" />
     </joint>
+
+  	<ros2_control name="GazeboSystem" type="system">
+  	  <hardware>
+  	    <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+  	  </hardware>
+  	  <joint name="x_axis_arm_to_holder">
+  	    <command_interface name="position">
+  	      <param name="min">${-hub_width/2}</param>
+  	      <param name="max">${hub_width/2}></param>
+  	    </command_interface>
+  	    <state_interface name="position"/>
+  	    <state_interface name="velocity"/>
+  	    <state_interface name="effort"/>
+  	  </joint>
+  	</ros2_control>
+
 
 
 </robot>

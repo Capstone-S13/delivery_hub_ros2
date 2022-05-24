@@ -27,7 +27,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 #     hub_src)
 
 install(
-  DIRECTORY launch meshes urdf rviz
+  DIRECTORY launch meshes urdf rviz config
   DESTINATION share/${PROJECT_NAME}
 )
 
