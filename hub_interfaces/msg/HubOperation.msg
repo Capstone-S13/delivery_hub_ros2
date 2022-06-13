@@ -1,0 +1,3 @@
+uint32 operation
+uint32 OPERATION_COLLECT=0
+uint32 OPERATION_DEPOSIT=1

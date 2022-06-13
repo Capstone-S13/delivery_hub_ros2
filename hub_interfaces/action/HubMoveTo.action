@@ -1,0 +1,12 @@
+float32 x
+float32 y
+float32 z
+---
+float32 current_x
+float32 current_y
+float32 current_z
+---
+float32 end_x
+float32 end_y
+float32 end_z
+bool in_position

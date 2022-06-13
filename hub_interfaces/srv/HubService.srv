@@ -1,0 +1,12 @@
+HubOperation operation
+string company_name
+string order_id
+---
+bool available_dock
+
+# is valid has two scenarios
+#   collecting : true means there is an empty hole
+#   depositing : true means there is such an order
+bool is_valid
+
+
