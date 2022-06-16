@@ -3,5 +3,7 @@ string company_name
 string order_id
 ---
 HubState state
+bool in_position
 ---
+HubState state
 bool in_position
