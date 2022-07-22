@@ -63,6 +63,7 @@ class Hub(Node):
         self.cnc_action_client = ActionClient(self, CncMoveTo, 'cnc_action')
         self.cnc_action_client.wait_for_server()
         self.get_logger().info("hub node is up!")
+        self.init_order_map()
 
 
     #utility functions
@@ -71,9 +72,11 @@ class Hub(Node):
         assert(len(self.config.toolhead_collect_pos) == len(self.config.toolhead_deposit_pos))
         # check if all values for coordinates are floats
         for i in range(len(self.config.toolhead_collect_pos)):
-            assert(type(self.config.toolhead_collect_pos[i]) == float)
+            for j in range(len(self.config.toolhead_collect_pos[i])):
+                assert(type(self.config.toolhead_collect_pos[i][j]) == float)
         for i in range(len(self.config.toolhead_deposit_pos)):
-            assert(type(self.config.toolhead_deposit_pos[i]) == float)
+            for j in range(len(self.config.toolhead_deposit_pos[i])):
+                assert(type(self.config.toolhead_deposit_pos[i][j]) == float)
 
         # set up the order map
         for i in range(len(self.config.toolhead_collect_pos)):
@@ -387,7 +390,7 @@ class Hub(Node):
             self.wait_for_toolhead()
 
             # give some leeway for the the pusher to be retracted back
-            time.sleep(2)
+            time.sleep(3)
 
             # move the cnc so toolhead is in position to slide parcel to robot
             cnc_goal = self.get_slider_send_pos()
