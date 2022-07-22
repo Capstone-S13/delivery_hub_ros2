@@ -12,19 +12,28 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
+find_package(hub_interfaces REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-    "msg/HubRequest.msg"
-)
+add_executable(hub
+  src/main.cpp
+  src/hub/hub.cpp)
 
-# add_executable(hub
-#   src/main.cpp)
+target_include_directories(hub
+  PRIVATE
+  include)
 
-# target_include_directories(hub include)
+ament_target_dependencies(hub
+  rclcpp
+  rclcpp_action
+  geometry_msgs
+  std_msgs
+  hub_interfaces
+  )
 
-# target_link_libraries(hub
-#   PRIVATE
-#     hub_src)
 
 install(
   DIRECTORY launch meshes urdf rviz config
@@ -43,3 +52,4 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
