@@ -23,6 +23,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'hub_node=hub_python.hub_node:main',
+            'test_deposit_service=hub_python.test_deposit_service:main',
+            'test_deposit_action=hub_python.test_deposit_action:main',
+            'test_collect_service=hub_python.test_collect_service:main',
+            'test_collect_action=hub_python.test_collect_action:main',
         ],
     },
 )
