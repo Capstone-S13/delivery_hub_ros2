@@ -22,7 +22,7 @@ class TestHubActionClient(Node):
 
 def main():
     company_name = "barg"
-    order_id = company_name + "my_uid"
+    order_id = company_name + "my_uid2"
     rclpy.init()
     action_client = TestHubActionClient()
     action_client.send_goal(company_name, order_id)
