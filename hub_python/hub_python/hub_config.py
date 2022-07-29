@@ -1,8 +1,8 @@
 
 class HubConfig():
     def __init__(self):
-        self.slider_rec_pos = (15.0, 0.0, 445.0)
-        self.slider_send_pos = (362.0, 0.0, 90.0)
+        self.slider_rec_pos = (20.0, 0.0, 445.0)
+        self.slider_send_pos = (367.0, 0.0, 80.0)
 
         # positions for the toolhead to collect from pigeon holes
         self.toolhead_collect_pos = [(15.0, 0.0, 680.0), (362.0, 0.0, 680.0), (15.0, 0.0, 1030.0), (362.0, 0.0, 1030.0)]
